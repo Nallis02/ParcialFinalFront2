@@ -10,11 +10,13 @@ import {
 } from "./citaSlice";
 import { obtenerMensaje } from "./utils";
 
+
 function Cita() {
   const [valorInput, setValorInput] = useState("");
   const { cita = "", personaje = "" } =
     useAppSelector(obtenerCitaDelEstado, shallowEqual) || {};
   const estadoPedido = useAppSelector(obtenerEstadoDelPedido);
+  const [error, setError] = useState("");
 
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -23,14 +25,31 @@ function Cita() {
     }
   }, [valorInput, dispatch]);
 
-   const onClickObtenerCita = () => {
-    if (valorInput) {
-      dispatch(obtenerCitaDeLaAPI(valorInput));
-    }else{
-      dispatch(obtenerCitaDeLaAPI(valorInput))
+  const onClickObtenerCita = () => {
+    if (!valorInput) {
+      setError("Ingresa un nombre de autor");
+      return;
+    }
+  
+    if (!isNaN(Number(valorInput))) {
+      setError("El nombre debe ser un texto");
+      return;
+    }
+  
+    dispatch(obtenerCitaDeLaAPI(valorInput));
+    setError("");
+  };
+  
+  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    setValorInput(inputValue);
+
+    if (inputValue && !isNaN(Number(inputValue))) {
+      setError("El nombre debe ser un texto");
+    } else {
+      setError("");
     }
   };
-
   const onClickBorrar = () => {
     dispatch(limpiar());
     setValorInput("");
@@ -40,10 +59,11 @@ function Cita() {
     <ContenedorCita>
       <TextoCita>{obtenerMensaje(cita, estadoPedido)}</TextoCita>
       <AutorCita>{personaje}</AutorCita>
+      {error && <span>{error}</span>}
       <Input
         aria-label="Author Cita"
         value={valorInput}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValorInput(e.target.value)}
+        onChange={onChangeInput}
         placeholder="Ingresa el nombre del autor"
       />
       <Boton
