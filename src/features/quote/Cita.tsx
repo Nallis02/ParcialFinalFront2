@@ -27,18 +27,21 @@ function Cita() {
 
   const onClickObtenerCita = () => {
     if (!valorInput) {
-      setError("Ingresa un nombre de autor");
+      dispatch(obtenerCitaDeLaAPI(valorInput));
       return;
     }
   
-    if (!isNaN(Number(valorInput))) {
-      setError("El nombre debe ser un texto");
-      return;
-    }
+    try {
+      if (!isNaN(Number(valorInput))) {
+        throw new Error("El nombre debe ser un texto");
+      }
   
-    dispatch(obtenerCitaDeLaAPI(valorInput));
-    setError("");
+      dispatch(obtenerCitaDeLaAPI(valorInput));
+    } catch (e) {
+      setError(error);
+    }
   };
+  
   
   const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -57,9 +60,8 @@ function Cita() {
 
   return (
     <ContenedorCita>
-      <TextoCita>{obtenerMensaje(cita, estadoPedido)}</TextoCita>
+      <TextoCita>{error ? error : obtenerMensaje(cita, estadoPedido)}</TextoCita>
       <AutorCita>{personaje}</AutorCita>
-      {error && <span>{error}</span>}
       <Input
         aria-label="Author Cita"
         value={valorInput}

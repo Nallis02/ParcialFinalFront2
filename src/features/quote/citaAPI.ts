@@ -4,8 +4,14 @@ import { ICita } from "./types";
 export const obtenerCita: (personaje?: string) => Promise<ICita> = async (
   personaje
 ) => {
-  if (personaje && parseInt(personaje)) {
-    throw new Error("El nombre debe ser un texto");
+  try{
+
+    if (personaje && parseInt(personaje)) {
+      throw new Error("El nombre debe ser un texto");
+    }
+  }catch (e){
+    console.log(e);
+    
   }
 
   const url = personaje ? `${API_URL}?character=${personaje}` : API_URL;
